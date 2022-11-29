@@ -6,19 +6,25 @@ module.exports = async (inputs, args) => {
     logger.debug('inputs not is plain object, skip handler');
     return inputs;
   }
+  // 如果 qualifier 不存在，则跳过
   const qualifier = _.get(args, 'qualifier');
   if (_.isNil(qualifier)) {
     logger.debug('args.qualifier isNil, skip');
     return inputs;
   }
+
+  // 解析传入的 deploy 参数 --type code / config
   const parsedArgs = commandParse(inputs);
   const rawData = _.get(parsedArgs, 'rawData', []);
   const type = _.get(parsedArgs, 'data.type');
+
+  // 获取插件参数
   const useQualifierConfig = _.get(args, 'use-qualifier-config', false);
   const useQualifierCode = _.get(args, 'use-qualifier-code', false);
-  const targetDir = _.get(args, 'code-uri', process.cwd()); // 
+  const targetDir = _.get(args, 'code-uri', process.cwd());
   logger.debug(`args type: ${type}, useQualifierConfig: ${useQualifierConfig}, useQualifierCode: ${useQualifierCode}`);
 
+  // 获取 yaml 的配置
   const region = _.get(inputs, 'props.region');
   const serviceName = _.get(inputs, 'props.service.name');
   if (_.isNil(region) || _.isNil(serviceName)) {
@@ -38,10 +44,13 @@ module.exports = async (inputs, args) => {
     functionName,
   }
 
+  // --type code --use-qualifier-config
   if (type === 'code' && useQualifierConfig === true) {
     const codeUri = _.get(inputs, 'props.function.codeUri');
+    // 获取指定版本的配置
     const fcInfo = await loadComponent('devsapp/fc-info');
     const remoteConfig = await fcInfo.info(cloneInputs);
+    // 处理配置信息
     if (isCustomContainer) {
       _.set(remoteConfig, 'function.customContainerConfig', customContainerConfig);
     } else {
@@ -52,18 +61,20 @@ module.exports = async (inputs, args) => {
     return _.omit(inputs, ['argsObj']);
   } else if (type === 'config' && useQualifierCode === true) {
     if (isCustomContainer) {
+      // 获取指定版本的配置
       const fcInfo = await loadComponent('devsapp/fc-info');
       const remoteConfig = await fcInfo.info(cloneInputs);
       const customContainerConfig = _.get(remoteConfig, 'function.customContainerConfig');
       _.set(inputs, 'props.function.customContainerConfig', customContainerConfig);
       return inputs;
     } else {
+      // 获取线上代码
       const fcSync = await loadComponent('devsapp/fc-sync');
       cloneInputs.args += ` --type code --force --target-dir ${targetDir}`;
-  
       const syncRes = await fcSync.sync(cloneInputs);
       const codeDir = _.get(syncRes, `codeFiles.${functionName}`);
       logger.info(`download codeDir: ${codeDir}`);
+      // 处理新的代码地址信息
       if (_.isNil(codeDir)) {
         throw new Error(`Can not find ${functionName} code dir.`);
       }
@@ -76,6 +87,7 @@ module.exports = async (inputs, args) => {
   return inputs;
 }
 
+// 干掉指定的 type，否则不会部署对映的线上配置
 function unsetType(rawData) {
   const index = _.indexOf(rawData, '--type')
   if (index !== -1) {
