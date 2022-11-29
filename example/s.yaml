@@ -1,0 +1,33 @@
+edition: 1.0.0
+name: component-test
+access: quanxi
+
+services:
+  component:
+    component: fc
+    actions:
+      pre-deploy:
+        # - plugin: ${path(..)} # use-qualifier-deploy-fc
+        - plugin: use-qualifier-deploy-fc
+          args:
+            qualifier: 1
+            use-qualifier-config: true
+            use-qualifier-code: true
+            code-uri: ./xxx
+      # post-deploy:
+      #   - component: fc version publish
+    props:
+      region: cn-shenzhen
+      service:
+        name: test-wss
+        description: 'hello world by latest'
+      function:
+        name: start-fc-event-nodejs14
+        description: '23'
+        runtime: nodejs12
+        codeUri: ./code
+        handler: index.handler
+        memorySize: 256
+        timeout: 60
+        environmentVariables:
+          test: value3
