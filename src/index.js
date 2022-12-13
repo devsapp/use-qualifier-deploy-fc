@@ -19,10 +19,8 @@ module.exports = async (inputs, args) => {
   const type = _.get(parsedArgs, 'data.type');
 
   // 获取插件参数
-  const useQualifierConfig = _.get(args, 'use-qualifier-config', false);
-  const useQualifierCode = _.get(args, 'use-qualifier-code', false);
   const targetDir = _.get(args, 'code-uri', process.cwd());
-  logger.debug(`args type: ${type}, useQualifierConfig: ${useQualifierConfig}, useQualifierCode: ${useQualifierCode}`);
+  logger.debug(`args type: ${type}`);
 
   // 获取 yaml 的配置
   const region = _.get(inputs, 'props.region');
@@ -44,8 +42,8 @@ module.exports = async (inputs, args) => {
     functionName,
   }
 
-  // --type code --use-qualifier-config
-  if (type === 'code' && useQualifierConfig === true) {
+  // --type code
+  if (type === 'code') {
     const codeUri = _.get(inputs, 'props.function.codeUri');
     // 获取指定版本的配置
     const fcInfo = await loadComponent('devsapp/fc-info');
@@ -59,7 +57,7 @@ module.exports = async (inputs, args) => {
     _.set(inputs, 'props', remoteConfig);
     inputs.args = unsetType(rawData);
     return _.omit(inputs, ['argsObj']);
-  } else if (type === 'config' && useQualifierCode === true) {
+  } else if (type === 'config') {
     if (isCustomContainer) {
       // 获取指定版本的配置
       const fcInfo = await loadComponent('devsapp/fc-info');
@@ -93,6 +91,6 @@ function unsetType(rawData) {
   if (index !== -1) {
     rawData.splice(0, 2);
   }
-  
+
   return _.join(rawData, ' ');
 }

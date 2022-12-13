@@ -7,12 +7,10 @@ services:
     component: fc
     actions:
       pre-deploy:
-        # - plugin: ${path(..)} # use-qualifier-deploy-fc
-        - plugin: use-qualifier-deploy-fc
+        - plugin: ${path(..)} # use-qualifier-deploy-fc
+        # - plugin: use-qualifier-deploy-fc
           args:
             qualifier: 1
-            use-qualifier-config: true
-            use-qualifier-code: true
             code-uri: ./xxx
       # post-deploy:
       #   - component: fc version publish
