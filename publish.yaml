@@ -2,7 +2,7 @@ Type: Plugin
 Name: use-qualifier-deploy-fc
 Provider:
   - 阿里云
-Version: 0.0.2
+Version: 0.0.3
 Description: 使用fc部署静态资源
 HomePage: https://github.com/devsapp/use-qualifier-deploy-fc
 Tags: #标签详情

@@ -89,7 +89,7 @@ module.exports = async (inputs, args) => {
 function unsetType(rawData) {
   const index = _.indexOf(rawData, '--type')
   if (index !== -1) {
-    rawData.splice(0, 2);
+    rawData.splice(index, 2);
   }
 
   return _.join(rawData, ' ');
