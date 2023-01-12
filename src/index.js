@@ -1,6 +1,7 @@
 const { lodash: _, loadComponent, Logger, commandParse } = require('@serverless-devs/core');
 
-module.exports = async (inputs, args) => {
+module.exports = async function (originInputs, args) {
+  const inputs = _.get(originInputs, 'output', originInputs);
   const logger = new Logger('use-qualifier-deploy-fc');
   if (!_.isPlainObject(inputs)) {
     logger.debug('inputs not is plain object, skip handler');
